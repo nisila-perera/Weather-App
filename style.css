@@ -43,11 +43,6 @@ body {
     text-shadow: 0 0 10px var(--neon-blue), 0 0 20px var(--neon-blue), 0 0 30px var(--neon-blue);
 }
 
-.text-neon-purple {
-    color: var(--neon-purple);
-    text-shadow: 0 0 10px var(--neon-purple), 0 0 20px var(--neon-purple), 0 0 30px var(--neon-purple);
-}
-
 h1 {
     text-align: center;
     margin-bottom: 2rem;
@@ -66,18 +61,20 @@ h1 {
     outline: none;
     color: white;
     background: rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
 }
 
-#searchBtn {
+button {
     padding: 0.5rem 1rem;
     border: none;
     cursor: pointer;
     background-color: var(--neon-blue);
     color: white;
     transition: all 0.3s ease;
+    border-radius: 10px;
 }
 
-#searchBtn:hover {
+button:hover {
     box-shadow: 0 0 15px var(--neon-blue);
     transform: translateY(-2px);
 }
@@ -96,6 +93,7 @@ h1 {
     display: grid;
     grid-template-columns: repeat(5, 1fr);
     gap: 1rem;
+    margin-bottom: 2rem;
 }
 
 .forecast-item {
@@ -133,6 +131,24 @@ h1 {
 .forecast-item p:last-child {
     font-size: 0.8em;
     opacity: 0.8;
+}
+
+.historical-data {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+#historicalChart {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 15px;
+    padding: 1rem;
+    margin-top: 1rem;
+}
+
+#mapContainer {
+    height: 300px;
+    border-radius: 15px;
+    overflow: hidden;
 }
 
 @media (max-width: 768px) {

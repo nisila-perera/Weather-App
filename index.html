@@ -3,25 +3,38 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>The Weather App</title>
+    <title>Weather App</title>
     <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
 </head>
 <body>
     <div class="container glassmorphism">
-        <h1 class="text-neon-blue">The Weather App</h1>
+        <h1 id="the-weather-app" class="text-neon-blue">The Weather App</h1>
+        
         <div class="search-container">
-            <input type="text" id="cityInput" placeholder="Enter city name" class="glassmorphism">
-            <button id="searchBtn" class="glassmorphism">Search</button>
+            <input type="text" id="cityInput" placeholder="Enter city name">
+            <button id="searchBtn">Search</button>
         </div>
+
         <div id="weatherInfo" class="weather-info">
             <h2 id="cityName"></h2>
-            <p id="temperature" class="text-neon-purple"></p>
+            <p id="temperature"></p>
             <p id="description"></p>
             <p id="humidity"></p>
             <p id="windSpeed"></p>
         </div>
+
         <div id="forecast" class="forecast-container"></div>
+
+        <div id="historicalData" class="historical-data">
+            <h3>Historical Data (Last 7 Days)</h3>
+            <div id="historicalChart"></div>
+        </div>
+
+        <div id="mapContainer"></div>
     </div>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
     <script src="script.js"></script>
 </body>
 </html>

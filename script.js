@@ -7,15 +7,17 @@ const description = document.getElementById('description');
 const humidity = document.getElementById('humidity');
 const windSpeed = document.getElementById('windSpeed');
 const forecast = document.getElementById('forecast');
+const historicalChart = document.getElementById('historicalChart');
+let map;
 
-searchBtn.addEventListener('click', () => {
+searchBtn.addEventListener('click', function() {
     const city = cityInput.value;
     if (city) {
         getWeather(city);
     }
 });
 
-cityInput.addEventListener('keypress', (e) => {
+cityInput.addEventListener('keypress', function(e) {
     if (e.key === 'Enter') {
         const city = cityInput.value;
         if (city) {
@@ -24,20 +26,42 @@ cityInput.addEventListener('keypress', (e) => {
     }
 });
 
-async function getWeather(city) {
-    try {
-        const weatherResponse = await fetch(`https://api.openweathermap.org/data/2.5/weather?q=${city}&units=metric&appid=${apiKey}`);
-        const weatherData = await weatherResponse.json();
+function getWeather(city) {
+    fetch(`https://api.openweathermap.org/data/2.5/weather?q=${city}&units=metric&appid=${apiKey}`)
+        .then(function(response) { return response.json(); })
+        .then(function(weatherData) {
+            displayWeather(weatherData);
+            return fetch(`https://api.openweathermap.org/data/2.5/forecast?q=${city}&units=metric&appid=${apiKey}`);
+        })
+        .then(function(response) { return response.json(); })
+        .then(function(forecastData) {
+            displayForecast(forecastData.list);
+            getHistoricalData(forecastData.city.coord.lat, forecastData.city.coord.lon);
+            updateMap(forecastData.city.coord.lat, forecastData.city.coord.lon);
+        })
+        .catch(function(error) {
+            console.error('Error fetching weather data:', error);
+            alert('Error fetching weather data. Please try again.');
+        });
+}
 
-        const forecastResponse = await fetch(`https://api.openweathermap.org/data/2.5/forecast?q=${city}&units=metric&appid=${apiKey}`);
-        const forecastData = await forecastResponse.json();
-
-        displayWeather(weatherData);
-        displayForecast(forecastData.list);
-    } catch (error) {
-        console.error('Error fetching weather data:', error);
-        alert('Error fetching weather data. Please try again.');
-    }
+function getWeatherByCoords(lat, lon) {
+    fetch(`https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&units=metric&appid=${apiKey}`)
+        .then(function(response) { return response.json(); })
+        .then(function(weatherData) {
+            displayWeather(weatherData);
+            return fetch(`https://api.openweathermap.org/data/2.5/forecast?lat=${lat}&lon=${lon}&units=metric&appid=${apiKey}`);
+        })
+        .then(function(response) { return response.json(); })
+        .then(function(forecastData) {
+            displayForecast(forecastData.list);
+            getHistoricalData(lat, lon);
+            updateMap(lat, lon);
+        })
+        .catch(function(error) {
+            console.error('Error fetching weather data:', error);
+            alert('Error fetching weather data. Please try again.');
+        });
 }
 
 function displayWeather(data) {
@@ -52,7 +76,7 @@ function displayForecast(forecastData) {
     forecast.innerHTML = '';
     const dailyForecasts = {};
 
-    forecastData.forEach(item => {
+    forecastData.forEach(function(item) {
         const date = new Date(item.dt * 1000);
         const day = date.toLocaleDateString('en-US', { weekday: 'short' });
 
@@ -61,7 +85,7 @@ function displayForecast(forecastData) {
         }
     });
 
-    Object.values(dailyForecasts).slice(0, 5).forEach(item => {
+    Object.values(dailyForecasts).slice(0, 5).forEach(function(item) {
         const date = new Date(item.dt * 1000);
         const forecastItem = document.createElement('div');
         forecastItem.classList.add('forecast-item');
@@ -75,4 +99,92 @@ function displayForecast(forecastData) {
     });
 }
 
-getWeather('Colombo');
+function getHistoricalData(lat, lon) {
+    const today = Math.floor(Date.now() / 1000);
+    const sevenDaysAgo = today - 7 * 24 * 60 * 60;
+    
+    fetch(`https://api.openweathermap.org/data/2.5/onecall/timemachine?lat=${lat}&lon=${lon}&dt=${sevenDaysAgo}&units=metric&appid=${apiKey}`)
+        .then(function(response) { return response.json(); })
+        .then(function(data) {
+            displayHistoricalData(data.hourly);
+        })
+        .catch(function(error) {
+            console.error('Error fetching historical data:', error);
+        });
+}
+
+function displayHistoricalData(hourlyData) {
+    const temperatures = hourlyData.map(function(item) { return item.temp; });
+    const labels = hourlyData.map(function(item) { return new Date(item.dt * 1000).toLocaleDateString(); });
+
+    if (window.historicalChart instanceof Chart) {
+        window.historicalChart.destroy();
+    }
+
+    window.historicalChart = new Chart(historicalChart, {
+        type: 'line',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: 'Temperature',
+                data: temperatures,
+                borderColor: 'rgb(75, 192, 192)',
+                tension: 0.1
+            }]
+        },
+        options: {
+            responsive: true,
+            scales: {
+                y: {
+                    beginAtZero: false,
+                    title: {
+                        display: true,
+                        text: 'Temperature (°C)'
+                    }
+                },
+                x: {
+                    title: {
+                        display: true,
+                        text: 'Date'
+                    }
+                }
+            }
+        }
+    });
+}
+
+function initMap() {
+    map = L.map('mapContainer').setView([0, 0], 2);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '© OpenStreetMap contributors'
+    }).addTo(map);
+}
+
+function updateMap(lat, lon) {
+    if (!map) {
+        initMap();
+    }
+    map.setView([lat, lon], 10);
+    L.marker([lat, lon]).addTo(map);
+}
+
+function init() {
+    initMap();
+    if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+            function(position) {
+                const lat = position.coords.latitude;
+                const lon = position.coords.longitude;
+                getWeatherByCoords(lat, lon);
+            },
+            function(error) {
+                console.error('Error getting location:', error);
+                getWeather('Colombo');
+            }
+        );
+    } else {
+        getWeather('Colombo');
+    }
+}
+
+init();
