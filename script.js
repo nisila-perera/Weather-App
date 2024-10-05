@@ -1,4 +1,5 @@
 const apiKey = '8482179c92bd8c64a406e230083527e1';
+
 const cityInput = document.getElementById('cityInput');
 const searchBtn = document.getElementById('searchBtn');
 const cityName = document.getElementById('cityName');
@@ -17,6 +18,7 @@ searchBtn.addEventListener('click', function() {
     }
 });
 
+
 cityInput.addEventListener('keypress', function(e) {
     if (e.key === 'Enter') {
         const city = cityInput.value;
@@ -25,6 +27,8 @@ cityInput.addEventListener('keypress', function(e) {
         }
     }
 });
+
+// get weather
 
 function getWeather(city) {
     fetch(`https://api.openweathermap.org/data/2.5/weather?q=${city}&units=metric&appid=${apiKey}`)
@@ -40,29 +44,12 @@ function getWeather(city) {
             updateMap(forecastData.city.coord.lat, forecastData.city.coord.lon);
         })
         .catch(function(error) {
-            console.error('Error fetching weather data:', error);
-            alert('Error fetching weather data. Please try again.');
+            console.log('Error:', error);
+            alert('Could not find weather data for that city. Please try again.');
         });
 }
 
-function getWeatherByCoords(lat, lon) {
-    fetch(`https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&units=metric&appid=${apiKey}`)
-        .then(function(response) { return response.json(); })
-        .then(function(weatherData) {
-            displayWeather(weatherData);
-            return fetch(`https://api.openweathermap.org/data/2.5/forecast?lat=${lat}&lon=${lon}&units=metric&appid=${apiKey}`);
-        })
-        .then(function(response) { return response.json(); })
-        .then(function(forecastData) {
-            displayForecast(forecastData.list);
-            getHistoricalData(lat, lon);
-            updateMap(lat, lon);
-        })
-        .catch(function(error) {
-            console.error('Error fetching weather data:', error);
-            alert('Error fetching weather data. Please try again.');
-        });
-}
+// display weather
 
 function displayWeather(data) {
     cityName.textContent = `${data.name}, ${data.sys.country}`;
@@ -71,6 +58,8 @@ function displayWeather(data) {
     humidity.textContent = `Humidity: ${data.main.humidity}%`;
     windSpeed.textContent = `Wind Speed: ${data.wind.speed} m/s`;
 }
+
+// fore cast
 
 function displayForecast(forecastData) {
     forecast.innerHTML = '';
@@ -99,6 +88,8 @@ function displayForecast(forecastData) {
     });
 }
 
+// history
+
 function getHistoricalData(lat, lon) {
     const today = Math.floor(Date.now() / 1000);
     const sevenDaysAgo = today - 7 * 24 * 60 * 60;
@@ -109,7 +100,7 @@ function getHistoricalData(lat, lon) {
             displayHistoricalData(data.hourly);
         })
         .catch(function(error) {
-            console.error('Error fetching historical data:', error);
+            console.log('Error fetching historical data:', error);
         });
 }
 
@@ -153,9 +144,11 @@ function displayHistoricalData(hourlyData) {
     });
 }
 
+// map
+
 function initMap() {
     map = L.map('mapContainer').setView([0, 0], 2);
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    L.tileLayer('https://{s}.tile.openweathermap.org/{z}/{x}/{y}.png', {
         attribution: '© OpenStreetMap contributors'
     }).addTo(map);
 }
@@ -168,6 +161,29 @@ function updateMap(lat, lon) {
     L.marker([lat, lon]).addTo(map);
 }
 
+function getWeatherByCoords(lat, lon) {
+    fetch(`https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&units=metric&appid=${apiKey}`)
+        .then(function(response) { return response.json(); })
+        .then(function(weatherData) {
+            displayWeather(weatherData);
+            return fetch(`https://api.openweathermap.org/data/2.5/forecast?lat=${lat}&lon=${lon}&units=metric&appid=${apiKey}`);
+        })
+        .then(function(response) { return response.json(); })
+        .then(function(forecastData) {
+            displayForecast(forecastData.list);
+            getHistoricalData(lat, lon);
+            updateMap(lat, lon);
+        })
+        .catch(function(error) {
+            console.log('Error fetching weather data:', error);
+            alert('Error fetching weather data. Please try again.');
+        });
+}
+
+
+
+
+// load
 function init() {
     initMap();
     if (navigator.geolocation) {
@@ -178,12 +194,12 @@ function init() {
                 getWeatherByCoords(lat, lon);
             },
             function(error) {
-                console.error('Error getting location:', error);
-                getWeather('Colombo');
+                console.log('Error getting location:', error);
+                getWeather('London');
             }
         );
     } else {
-        getWeather('Colombo');
+        getWeather('London');
     }
 }
 

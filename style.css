@@ -1,12 +1,5 @@
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap');
 
-:root {
-    --neon-blue: #4cc9f0;
-    --neon-purple: #b5179e;
-    --bg-dark: #1a1a2e;
-    --bg-light: #16213e;
-}
-
 * {
     margin: 0;
     padding: 0;
@@ -15,7 +8,7 @@
 
 body {
     font-family: 'Poppins', sans-serif;
-    background: linear-gradient(135deg, var(--bg-dark), var(--bg-light));
+    background-color: #1a1a2e;
     min-height: 100vh;
     display: flex;
     justify-content: center;
@@ -28,25 +21,21 @@ body {
     width: 90%;
     margin: 2rem auto;
     padding: 2rem;
-}
-
-.glassmorphism {
-    background: rgba(255, 255, 255, 0.05);
+    background-color: rgba(255, 255, 255, 0.05);
     backdrop-filter: blur(10px);
     border: 1px solid rgba(255, 255, 255, 0.1);
     box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
     border-radius: 20px;
 }
 
-.text-neon-blue {
-    color: var(--neon-blue);
-    text-shadow: 0 0 10px var(--neon-blue), 0 0 20px var(--neon-blue), 0 0 30px var(--neon-blue);
-}
 
 h1 {
     text-align: center;
     margin-bottom: 2rem;
+    color: #4cc9f0;
+    text-shadow: 0 0 10px #4cc9f0, 0 0 20px #4cc9f0, 0 0 30px #4cc9f0;
 }
+
 
 .search-container {
     display: flex;
@@ -54,30 +43,35 @@ h1 {
     margin-bottom: 2rem;
 }
 
+
 #cityInput {
     flex-grow: 1;
     padding: 0.5rem 1rem;
     border: none;
     outline: none;
     color: white;
-    background: rgba(255, 255, 255, 0.1);
+    background-color: rgba(255, 255, 255, 0.1);
     border-radius: 10px;
 }
+
 
 button {
     padding: 0.5rem 1rem;
     border: none;
     cursor: pointer;
-    background-color: var(--neon-blue);
+    background-color: #4cc9f0;
     color: white;
     transition: all 0.3s ease;
     border-radius: 10px;
 }
 
 button:hover {
-    box-shadow: 0 0 15px var(--neon-blue);
+    box-shadow: 0 0 15px #4cc9f0;
     transform: translateY(-2px);
 }
+
+
+
 
 .weather-info {
     text-align: center;
@@ -97,7 +91,7 @@ button:hover {
 }
 
 .forecast-item {
-    background: rgba(255, 255, 255, 0.1);
+    background-color: rgba(255, 255, 255, 0.1);
     border-radius: 15px;
     padding: 1rem;
     text-align: center;
@@ -125,7 +119,7 @@ button:hover {
 
 .forecast-item p:first-child {
     font-weight: bold;
-    color: var(--neon-blue);
+    color: #4cc9f0;
 }
 
 .forecast-item p:last-child {
@@ -133,17 +127,20 @@ button:hover {
     opacity: 0.8;
 }
 
+
+
 .historical-data {
     text-align: center;
     margin-bottom: 2rem;
 }
 
 #historicalChart {
-    background: rgba(255, 255, 255, 0.1);
+    background-color: rgba(255, 255, 255, 0.1);
     border-radius: 15px;
     padding: 1rem;
     margin-top: 1rem;
 }
+
 
 #mapContainer {
     height: 300px;
@@ -151,6 +148,7 @@ button:hover {
     overflow: hidden;
 }
 
+/* Responsive */
 @media (max-width: 768px) {
     .container {
         padding: 1rem;
